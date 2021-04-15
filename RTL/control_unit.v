@@ -24,7 +24,7 @@ module control_unit(
 
    parameter [1:0] ADD_OPCODE     = 2'd0;
    parameter [1:0] SUB_OPCODE     = 2'd1;
-   parameter [1:0] JUMP_OPCODE    = 2'dxx;
+   parameter [1:0] JUMP_OPCODE    = 2'bXX;
    parameter [1:0] R_TYPE_OPCODE  = 2'd2;
 
 
@@ -121,5 +121,6 @@ module control_unit(
          end
       endcase
    end
+
 
 endmodule
