@@ -25,7 +25,7 @@ module alu #(
    //The alu control codes can be found
    //in chapter 4.4 of the book.
    //PARAMETER DECLARATION
-   
+
    parameter [3:0] AND_OP = 4'd0;
    parameter [3:0]  OR_OP = 4'd1;
    parameter [3:0] ADD_OP = 4'd2;
@@ -34,6 +34,7 @@ module alu #(
    parameter [3:0] SUB_OP = 4'd5;
    parameter [3:0] SLT_OP = 4'd7;
    parameter [3:0] NOR_OP = 4'd12;
+   parameter [3:0] MUL_OP = 4'd13;
 
 
    //REG AND WIRE DECLARATION
@@ -41,10 +42,10 @@ module alu #(
                            nor_out,slt_out, sll_out, srl_out;
 	reg 		               overflow_add,overflow_sub,
                            msb_equal_flag;
-   
-   
-   
-   //ZERO FLAG 
+
+
+
+   //ZERO FLAG
    //
    //Statements like this can be written in a more
    //compact way in Verilog:
@@ -68,7 +69,8 @@ module alu #(
       and_out  =   alu_in_0 & alu_in_1;
       or_out   =   alu_in_0 | alu_in_1;
       nor_out  = ~(alu_in_0 | alu_in_1);
-      slt_out  =  (alu_in_0 < alu_in_1) ? 1:0;        //Zero extend the 1 bit slt flag to a DATA_W bit value     
+      slt_out  =  (alu_in_0 < alu_in_1) ? 1:0;        //Zero extend the 1 bit slt flag to a DATA_W bit value
+      mul_out  =   alu_in_0 * alu_in_0;
    end
 
    //This block will translate into a multiplexer, where alu_ctrl
@@ -79,11 +81,12 @@ module alu #(
 			AND_OP:  alu_out = and_out;
 			OR_OP:   alu_out =  or_out;
 			NOR_OP:  alu_out = nor_out;
-			ADD_OP:  alu_out = add_out;			
+			ADD_OP:  alu_out = add_out;
 			SUB_OP:  alu_out = sub_out;
 			SLT_OP:  alu_out = slt_out;
 			SLL_OP:  alu_out = sll_out;
 			SRL_OP:  alu_out = srl_out;
+      MUL_OP:  alu_out = mul_out;
 			default: alu_out =     'd0;
 		endcase
 	end
@@ -98,7 +101,7 @@ module alu #(
          msb_equal_flag = 1'b0;
       end
    end
-   
+
    always@(*)begin
       if((msb_equal_flag == 1'b1) && (add_out[DATA_W-1] != alu_in_0[DATA_W-1]))begin
          overflow_add = 1'b1;
@@ -124,10 +127,7 @@ module alu #(
          overflow = overflow_add;
       else
          overflow = overflow_sub;
-  end 
+  end
 
 
 endmodule
-
-
-
