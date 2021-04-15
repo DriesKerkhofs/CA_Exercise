@@ -1,4 +1,4 @@
-//Register File
+fc3//Register File
 //Function: This block has 2 main functions (1) Read the registers pointed by the incoming addresses (raddr_1 and raddr_2) into the outputs rdata_1 and rdata_2 respectively. (2) Write the desired writing data (wdata) into the address pointed by the write address (waddr) if write enable (reg_write) is asserted.
 //clk: System clock
 //arst_n: Asynchronous Reset
@@ -26,11 +26,6 @@ module register_file#(
    );
 
    parameter integer N_REG      = 32;
-
-   
-   
-   reg [DATA_W-1:0] reg_array     [0:N_REG-1];
-   reg [DATA_W-1:0] reg_array_nxt [0:N_REG-1];
 
 
    integer idx;
@@ -65,9 +60,6 @@ module register_file#(
       end
    end
 
-    
-    
+
+
 endmodule
-
-
-

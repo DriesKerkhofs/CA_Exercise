@@ -24,6 +24,7 @@ module control_unit(
 
    parameter [1:0] ADD_OPCODE     = 2'd0;
    parameter [1:0] SUB_OPCODE     = 2'd1;
+   parameter [1:0] JUMP_OPCODE    = 2'dxx;
    parameter [1:0] R_TYPE_OPCODE  = 2'd2;
 
 
@@ -89,7 +90,7 @@ module control_unit(
             mem_read  = 1'b0;
             mem_write = 1'b0;
             branch    = 1'b0;
-            alu_op    = ADD_OPCODE;
+            alu_op    = R_TYPE_OPCODE;
             jump      = 1'b0;
          end
 
@@ -101,7 +102,7 @@ module control_unit(
             mem_read  = 1'bX;
             mem_write = 1'bX;
             branch    = 1'bX;
-            alu_op    = ADD_OPCODE;
+            alu_op    = JUMP_OPCODE;
             jump      = 1'b1;
          end
 
