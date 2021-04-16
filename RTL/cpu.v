@@ -2,7 +2,7 @@
 //Function: CPU is the top design of the processor
 //Inputs:
 //	clk: main clock
-//	arst_n: reset 
+//	arst_n: reset
 // 	enable: Starts the execution
 //	addr_ext: Address for reading/writing content to Instruction Memory
 //	wen_ext: Write enable for Instruction Memory
@@ -30,27 +30,113 @@ module cpu(
 		input  wire         wen_ext_2,
 		input  wire         ren_ext_2,
 		input  wire [31:0]  wdata_ext_2,
-		
+
 		output wire	[31:0]  rdata_ext,
 		output wire	[31:0]  rdata_ext_2
 
    );
+wire [31:0]					IF_current_pc,
+										IF_updated_pc,
+										IF_instruction;
 
-wire              zero_flag;
-wire [      31:0] branch_pc,updated_pc,current_pc,jump_pc,
-                  instruction;
-wire [       1:0] alu_op;
-wire [       3:0] alu_control;
-wire              reg_dst,branch,mem_read,mem_2_reg,
-                  mem_write,alu_src, reg_write, jump;
-wire [       4:0] regfile_waddr;
-wire [      31:0] regfile_wdata, dram_data,alu_out,
-                  regfile_data_1,regfile_data_2,
-                  alu_operand_2;
+wire signed [31:0]	ID_immediate_extended;
+wire [31:0]	  			ID_updated_pc,
+										ID_instruction,
+										ID_regfile_data_1,
+										ID_regfile_data_2;
+wire [1:0] 					ID_alu_op;
+wire              	ID_branch,
+										ID_mem_read,
+										ID_jump,
+										ID_reg_write,
+										ID_mem_2_reg,
+										ID_mem_write,
+										ID_reg_dst;
+										ID_alu_src;
 
-wire signed [31:0] immediate_extended;
+wire signed [31:0]  EX_immediate_extended;
+wire [31:0]					EX_instruction,
+										EX_jump_pc,
+										EX_branch_pc,
+ 										EX_alu_out,
+										EX_regfile_data_1,
+										EX_regfile_data_2,
+										EX_alu_operand_2,
+										EX_updated_pc;
+wire [4:0] 					EX_regfile_waddr;
+wire [3:0] 					EX_alu_control;
+wire [1:0]   				EX_alu_op;
+wire              	EX_zero_flag,
+										EX_branch,
+										EX_mem_read,
+										EX_jump,
+										EX_reg_write,
+										EX_mem_2_reg,
+										EX_mem_write,
+										EX_alu_src;
 
-assign immediate_extended = $signed(instruction[15:0]);
+wire [31:0]					MEM_jump_pc,
+										MEM_branch_pc,
+										MEM_regfile_data_2,
+										MEM_dram_data,
+										MEM_alu_out;
+wire [4:0]					MEM_regfile_waddr;
+wire								MEM_zero_flag,
+ 										MEM_mem_read,
+										MEM_jump,
+										MEM_branch
+										MEM_reg_write,
+										MEM_mem_2_reg,
+										MEM_mem_write;
+
+wire [31:0]					WB_alu_out,
+										WB_regfile_wdata,
+										WB_dram_data;
+wire [4:0]  				WB_regfile_waddr;
+wire  							WB_reg_write,
+										WB_mem_2_reg;
+
+
+//register IF/ID
+assign ID_updated_pc  		   	= IF_updated_pc;
+assign ID_instruction 				= IF_instruction;
+
+//register ID/EX
+assign EX_immediate_extended  = ID_immediate_extended;
+assign EX_instruction				 	= ID_instruction;
+assign EX_updated_pc				 	= ID_updated_pc;
+assign EX_regfile_data_1     	= ID_regfile_data_1;
+assign EX_regfile_data_2		 	= ID_regfile_data_2;
+assign EX_alu_op						 	= ID_alu_op;
+assign EX_branch						 	= ID_branc;
+assign EX_mem_read						= ID_mem_read;
+assign EX_jump								= ID_jump;
+assign EX_reg_write						= ID_reg_write;
+assign EX_mem_2_reg						= ID_mem_2_reg;
+assign EX_mem_write						= ID_mem_write;
+assign EX_alu_src							= ID_alu_src;
+
+//register EX/MEM
+assign MEM_jump_pc						= EX_jump_pc;
+assign MEM_branch_pc					= EX_branch_pc;
+assign MEM_alu_out						= EX_alu_out;
+assign MEM_regfile_waddr			= EX_regfile_waddr;
+assign MEM_zero_flag					= EX_zero_flag;
+assign MEM_mem_read						= EX_mem_read;
+assign MEM_branch							= EX_branch;
+assign MEM_jump								= EX_jump;
+assign MEM_reg_write					= EX_reg_write;
+assign MEM_mem_2_reg					= EX_2_reg;
+assign MEM_mem_write					= EX_mem_write;
+
+//register MEM/WB
+assign WB_dram_data						= MEM_dram_data;
+assign WB_alu_out							= MEM_alu_out;
+assign WB_regfile_waddr				= MEM_regfile_waddr;
+assign WB_reg_write						= MEM_reg_write;
+assign WB_mem_2_reg						= MEM_mem_2_reg;
+
+assign ID_immediate_extended = $signed(ID_instruction[15:0]);
 
 
 pc #(
@@ -58,14 +144,14 @@ pc #(
 ) program_counter (
    .clk       (clk       ),
    .arst_n    (arst_n    ),
-   .branch_pc (branch_pc ),
-   .jump_pc   (jump_pc   ),
-   .zero_flag (zero_flag ),
-   .branch    (branch    ),
-   .jump      (jump      ),
-   .current_pc(current_pc),
+   .branch_pc (MEM_branch_pc ),
+   .jump_pc   (MEM_jump_pc   ),
+   .zero_flag (MEM_zero_flag ),
+   .branch    (MEM_branch    ),
+   .jump      (MEM_jump      ),
+   .current_pc(IF_current_pc),
    .enable    (enable    ),
-   .updated_pc(updated_pc)
+   .updated_pc(IF_updated_pc)
 );
 
 
@@ -74,39 +160,39 @@ sram #(
    .DATA_W(32)
 ) instruction_memory(
    .clk      (clk           ),
-   .addr     (current_pc    ),
+   .addr     (IF_current_pc    ),
    .wen      (1'b0          ),
    .ren      (1'b1          ),
    .wdata    (32'b0         ),
-   .rdata    (instruction   ),   
+   .rdata    (IF_instruction),
    .addr_ext (addr_ext      ),
-   .wen_ext  (wen_ext       ), 
+   .wen_ext  (wen_ext       ),
    .ren_ext  (ren_ext       ),
    .wdata_ext(wdata_ext     ),
    .rdata_ext(rdata_ext     )
 );
 
 control_unit control_unit(
-   .opcode   (instruction[31:26]),
-   .reg_dst  (reg_dst           ),
-   .branch   (branch            ),
-   .mem_read (mem_read          ),
-   .mem_2_reg(mem_2_reg         ),
-   .alu_op   (alu_op            ),
-   .mem_write(mem_write         ),
-   .alu_src  (alu_src           ),
-   .reg_write(reg_write         ),
-   .jump     (jump              )
+   .opcode   (ID_instruction[31:26]),
+   .reg_dst  (ID_reg_dst           ),
+   .branch   (ID_branch            ),
+   .mem_read (ID_mem_read          ),
+   .mem_2_reg(ID_mem_2_reg         ),
+   .alu_op   (ID_alu_op            ),
+   .mem_write(ID_mem_write         ),
+   .alu_src  (ID_alu_src           ),
+   .reg_write(ID_reg_write         ),
+   .jump     (ID_jump              )
 );
 
 
 mux_2 #(
    .DATA_W(5)
 ) regfile_dest_mux (
-   .input_a (instruction[15:11]),
-   .input_b (instruction[20:16]),
-   .select_a(reg_dst          ),
-   .mux_out (regfile_waddr     )
+   .input_a (EX_instruction[15:11]),
+   .input_b (EX_instruction[20:16]),
+   .select_a(EX_reg_dst          ),
+   .mux_out (EX_regfile_waddr     )
 );
 
 register_file #(
@@ -114,41 +200,41 @@ register_file #(
 ) register_file(
    .clk      (clk               ),
    .arst_n   (arst_n            ),
-   .reg_write(reg_write         ),
-   .raddr_1  (instruction[25:21]),
-   .raddr_2  (instruction[20:16]),
-   .waddr    (regfile_waddr     ),
+   .reg_write(WB_reg_write         ),
+   .raddr_1  (ID_instruction[25:21]),
+   .raddr_2  (ID_instruction[20:16]),
+   .waddr    (WB_regfile_waddr     ),
    .wdata    (regfile_wdata     ),
-   .rdata_1  (regfile_data_1    ),
-   .rdata_2  (regfile_data_2    )
+   .rdata_1  (ID_regfile_data_1    ),
+   .rdata_2  (ID_regfile_data_2    )
 );
 
 
 alu_control alu_ctrl(
-   .function_field (instruction[5:0]),
-   .alu_op         (alu_op          ),
-   .alu_control    (alu_control     )
+   .function_field (EX_instruction[5:0]),
+   .alu_op         (EX_alu_op          ),
+   .alu_control    (EX_alu_control     )
 );
 
 mux_2 #(
    .DATA_W(32)
 ) alu_operand_mux (
-   .input_a (immediate_extended),
-   .input_b (regfile_data_2    ),
-   .select_a(alu_src           ),
-   .mux_out (alu_operand_2     )
+   .input_a (EX_immediate_extended),
+   .input_b (EX_regfile_data_2    ),
+   .select_a(EX_alu_src           ),
+   .mux_out (EX_alu_operand_2     )
 );
 
 
 alu#(
    .DATA_W(32)
 ) alu(
-   .alu_in_0 (regfile_data_1),
-   .alu_in_1 (alu_operand_2 ),
-   .alu_ctrl (alu_control   ),
-   .alu_out  (alu_out       ),
-   .shft_amnt(instruction[10:6]),
-   .zero_flag(zero_flag     ),
+   .alu_in_0 (EX_regfile_data_1),
+   .alu_in_1 (EX_alu_operand_2 ),
+   .alu_ctrl (EX_alu_control   ),
+   .alu_out  (EX_alu_out       ),
+   .shft_amnt(EX_instruction[10:6]),
+   .zero_flag(EX_zero_flag     ),
    .overflow (              )
 );
 
@@ -157,11 +243,11 @@ sram #(
    .DATA_W(32)
 ) data_memory(
    .clk      (clk           ),
-   .addr     (alu_out       ),
-   .wen      (mem_write     ),
-   .ren      (mem_read      ),
-   .wdata    (regfile_data_2),
-   .rdata    (dram_data     ),   
+   .addr     (MEM_alu_out       ),
+   .wen      (MEM_mem_write     ),
+   .ren      (MEM_mem_read      ),
+   .wdata    (MEM_regfile_data_2),
+   .rdata    (MEM_dram_data     ),
    .addr_ext (addr_ext_2    ),
    .wen_ext  (wen_ext_2     ),
    .ren_ext  (ren_ext_2     ),
@@ -174,10 +260,10 @@ sram #(
 mux_2 #(
    .DATA_W(32)
 ) regfile_data_mux (
-   .input_a  (dram_data    ),
-   .input_b  (alu_out      ),
-   .select_a (mem_2_reg     ),
-   .mux_out  (regfile_wdata)
+   .input_a  (WB_dram_data    ),
+   .input_b  (WB_alu_out      ),
+   .select_a (WB_mem_2_reg     ),
+   .mux_out  (WB_regfile_wdata)
 );
 
 
@@ -185,14 +271,12 @@ mux_2 #(
 branch_unit#(
    .DATA_W(32)
 )branch_unit(
-   .updated_pc   (updated_pc        ),
-   .instruction  (instruction       ),
-   .branch_offset(immediate_extended),
-   .branch_pc    (branch_pc         ),
-   .jump_pc      (jump_pc         )
+   .updated_pc   (EX_updated_pc        ),
+   .instruction  (EX_instruction       ),
+   .branch_offset(EX_immediate_extended),
+   .branch_pc    (EX_branch_pc         ),
+   .jump_pc      (EX_jump_pc         )
 );
 
 
 endmodule
-
-
