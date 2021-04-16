@@ -229,7 +229,7 @@ reg_arstn_en #(
 					MEM_regfile_waddr,
 					MEM_reg_write,
 					MEM_mem_2_reg}),
-	 .din ({WB_dram_data,
+	 .dout({WB_dram_data,
 		 			WB_alu_out,
 					WB_regfile_waddr,
 					WB_reg_write,
