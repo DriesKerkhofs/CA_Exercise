@@ -113,19 +113,53 @@ reg_arstn_en #(
 
 
 //register ID/EX
-assign EX_immediate_extended  = ID_immediate_extended;
-assign EX_instruction				 	= ID_instruction;
-assign EX_updated_pc				 	= ID_updated_pc;
-assign EX_regfile_data_1     	= ID_regfile_data_1;
-assign EX_regfile_data_2		 	= ID_regfile_data_2;
-assign EX_alu_op						 	= ID_alu_op;
-assign EX_branch						 	= ID_branch;
-assign EX_mem_read						= ID_mem_read;
-assign EX_jump								= ID_jump;
-assign EX_reg_write						= ID_reg_write;
-assign EX_mem_2_reg						= ID_mem_2_reg;
-assign EX_mem_write						= ID_mem_write;
-assign EX_alu_src							= ID_alu_src;
+reg_arstn_en #(
+   .DATA_W(169),
+	 .PRESET_VAL(0)
+) reg_IDEX (
+   .clk (clk),
+   .arst_n (arst_n),
+   .en(enable),
+   .din ({ID_immediate_extended,
+		 			ID_instruction,
+					ID_updated_pc,
+					ID_regfile_data_1,
+					ID_regfile_data_2,
+					ID_alu_op,
+					ID_branch,
+					ID_mem_read,ID_jump,
+					ID_reg_write,
+					ID_reg_write,
+					ID_mem_2_reg,
+					ID_mem_write,
+					ID_alu_src}),
+	.dout ({EX_immediate_extended,
+		 			EX_instruction,
+					EX_updated_pc,
+					EX_regfile_data_1,
+					EX_regfile_data_2,
+					EX_alu_op,
+					EX_branch,
+					EX_mem_read,ID_jump,
+					EX_reg_write,
+					EX_reg_write,
+					EX_mem_2_reg,
+					EX_mem_write,
+					EX_alu_src})
+);
+assign EX_immediate_extended  = ID_immediate_extended;													//32
+assign EX_instruction				 	= ID_instruction;																	//32
+assign EX_updated_pc				 	= ID_updated_pc;																	//32
+assign EX_regfile_data_1     	= ID_regfile_data_1;															//32
+assign EX_regfile_data_2		 	= ID_regfile_data_2;															//32
+assign EX_alu_op						 	= ID_alu_op;																			//2
+assign EX_branch						 	= ID_branch;																			//1
+assign EX_mem_read						= ID_mem_read;																		//1
+assign EX_jump								= ID_jump;																				//1
+assign EX_reg_write						= ID_reg_write;																		//1
+assign EX_mem_2_reg						= ID_mem_2_reg;																		//1
+assign EX_mem_write						= ID_mem_write;																		//1
+assign EX_alu_src							= ID_alu_src;																			//1 ->169 bits
 
 //register EX/MEM
 assign MEM_jump_pc						= EX_jump_pc;
