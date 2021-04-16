@@ -98,8 +98,19 @@ wire  							WB_reg_write,
 
 
 //register IF/ID
-assign ID_updated_pc  		   	= IF_updated_pc;
-assign ID_instruction 				= IF_instruction;
+reg_arstn_en #(
+   .DATA_W(64)
+	 .PRESET_VAL(0)
+) regfile_dest_mux (
+   .clk (clk),
+   .arst_n (arst_n),
+   .en(enable),
+   .din ({IF_updated_pc,IF_instruction})
+	 .dout ({ID_updated_pc,ID_instruction})
+);
+// assign ID_updated_pc  		   	= IF_updated_pc;																//32
+// assign ID_instruction 				= IF_instruction;																//32
+
 
 //register ID/EX
 assign EX_immediate_extended  = ID_immediate_extended;
