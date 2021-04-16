@@ -217,11 +217,29 @@ reg_arstn_en #(
 
 
 //register MEM/WB
-assign WB_dram_data						= MEM_dram_data;
-assign WB_alu_out							= MEM_alu_out;
-assign WB_regfile_waddr				= MEM_regfile_waddr;
-assign WB_reg_write						= MEM_reg_write;
-assign WB_mem_2_reg						= MEM_mem_2_reg;
+reg_arstn_en #(
+   .DATA_W(71),
+	 .PRESET_VAL(0)
+) reg_IFID (
+   .clk (clk),
+   .arst_n (arst_n),
+   .en(enable),
+   .din ({MEM_dram_data,
+		 			MEM_alu_out,
+					MEM_regfile_waddr,
+					MEM_reg_write,
+					MEM_mem_2_reg}),
+	 .din ({WB_dram_data,
+		 			WB_alu_out,
+					WB_regfile_waddr,
+					WB_reg_write,
+					WB_mem_2_reg})
+);
+// assign WB_dram_data						= MEM_dram_data;																	//32
+// assign WB_alu_out							= MEM_alu_out;																		//32
+// assign WB_regfile_waddr				= MEM_regfile_waddr;															//5
+// assign WB_reg_write						= MEM_reg_write;																	//1
+// assign WB_mem_2_reg						= MEM_mem_2_reg;																  //1 ->71 bits
 
 assign ID_immediate_extended = $signed(ID_instruction[15:0]);
 
