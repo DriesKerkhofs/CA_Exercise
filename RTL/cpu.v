@@ -105,7 +105,7 @@ reg_arstn_en #(
    .clk (clk),
    .arst_n (arst_n),
    .en(enable),
-   .din ({IF_updated_pc,IF_instruction})
+   .din ({IF_updated_pc,IF_instruction}),
 	 .dout ({ID_updated_pc,ID_instruction})
 );
 // assign ID_updated_pc  		   	= IF_updated_pc;																//32
