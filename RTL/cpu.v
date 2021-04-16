@@ -84,7 +84,7 @@ wire [4:0]					MEM_regfile_waddr;
 wire								MEM_zero_flag,
  										MEM_mem_read,
 										MEM_jump,
-										MEM_branch
+										MEM_branch,
 										MEM_reg_write,
 										MEM_mem_2_reg,
 										MEM_mem_write;
