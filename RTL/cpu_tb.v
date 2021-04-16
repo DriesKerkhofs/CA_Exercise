@@ -39,10 +39,10 @@ initial begin
    wdata_ext_2 = 'b0;
    cnt_and_wait(10);
    arst_n = 1'b1;
-   
+
    load_dmem();
    load_imem();
-   
+
    cnt_and_wait(1);
    enable = 1'b1;
    counter = 0;
@@ -86,7 +86,7 @@ begin
    end
     $readmemh("../SIM/data/imem_content.txt",instr_mem);
    cnt_and_wait(10);
-   
+
    for (imem_cnt = 0; imem_cnt < IMEM_SIZE; imem_cnt = imem_cnt+1)  begin
       wait(clk==1'b0);
       wen_ext   = 1'b1;
@@ -94,14 +94,14 @@ begin
       wdata_ext = instr_mem[imem_cnt];
       addr_ext  = imem_cnt<<2;
       wait(clk==1'b1);
-      
+
    end
    wen_ext   = 1'b0;
    ren_ext   = 1'b0;
    wdata_ext = 'b0;
    addr_ext  = 'b0;
 end
-endtask 
+endtask
 
 
 task load_dmem();
@@ -111,7 +111,7 @@ begin
    end
     $readmemh("../SIM/data/dmem_content.txt",data_mem);
    cnt_and_wait(10);
-   
+
    for (dmem_cnt = 0; dmem_cnt < DMEM_SIZE; dmem_cnt = dmem_cnt+1)  begin
       wait(clk==1'b0);
       wen_ext_2   = 1'b1;
@@ -119,14 +119,14 @@ begin
       wdata_ext_2 = data_mem[dmem_cnt];
       addr_ext_2  = dmem_cnt<<2;
       wait(clk==1'b1);
-      
+
    end
    wen_ext_2   = 1'b0;
    ren_ext_2   = 1'b0;
    wdata_ext_2 = 'b0;
    addr_ext_2  = 'b0;
 end
-endtask 
+endtask
 
 
 
@@ -167,9 +167,9 @@ task test_basic;
       $display("Error in BRANCH instruction, Value is %h" ,dut.register_file.reg_array[20] );
       $display("%c[0m",27);
    end
-   
-   
-   
+
+
+
 endtask
 
 task test_mult;
@@ -181,7 +181,7 @@ task test_mult;
       $display("%c[1;31m",27);
       $display("Error in Mult function");
       $display("%c[0m",27);
-   end   
+   end
 endtask
 
 
@@ -194,7 +194,7 @@ task test_mult_2;
       $display("%c[1;31m",27);
       $display("Error in Mult function");
       $display("%c[0m",27);
-   end   
+   end
 endtask
 
 
@@ -213,21 +213,21 @@ endtask
 task wait_for_STOP_instruction;
 begin
   //stop instruction
-   wait (dut.instruction[31:26]==6'b111110);
-   if(dut.instruction[1:0]==2'b00)
+   wait (dut.IF_instruction[31:26]==6'b111110);
+   if(dut.IF_instruction[1:0]==2'b00)
     test_basic();
    else
-    if(dut.instruction[1:0]==2'b01)
+    if(dut.IF_instruction[1:0]==2'b01)
       test_mult();
    else
       test_mult_2();
-      
+
    $display("%d cycles", counter);
    $finish;
 end
 endtask
 
-initial 
+initial
   begin
   $dumpfile("vcd_dump.vcd");
   $dumpvars(0);
