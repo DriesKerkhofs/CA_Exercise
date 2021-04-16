@@ -128,6 +128,7 @@ assign MEM_jump								= EX_jump;
 assign MEM_reg_write					= EX_reg_write;
 assign MEM_mem_2_reg					= EX_mem_2_reg;
 assign MEM_mem_write					= EX_mem_write;
+assign MEM_regfile_data_2			= EX_regfile_data_2;
 
 //register MEM/WB
 assign WB_dram_data						= MEM_dram_data;
