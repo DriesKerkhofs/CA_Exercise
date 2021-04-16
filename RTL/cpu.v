@@ -192,7 +192,7 @@ mux_2 #(
 ) regfile_dest_mux (
    .input_a (EX_instruction[15:11]),
    .input_b (EX_instruction[20:16]),
-   .select_a(EX_reg_dst          ),
+   .select_a(ID_reg_dst          ),
    .mux_out (EX_regfile_waddr     )
 );
 

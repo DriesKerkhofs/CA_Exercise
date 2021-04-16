@@ -18,7 +18,7 @@ ffffffff
 ffffffff
 ffffffff
 ffffffff
-02129820 // add $s3, $s0, $s2
+02129820 // add $s3, $s0, $s2     000000 10000 10010 10011 00000 100000
 ffffffff
 ffffffff
 ffffffff
