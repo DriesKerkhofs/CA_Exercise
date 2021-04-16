@@ -220,7 +220,7 @@ reg_arstn_en #(
 reg_arstn_en #(
    .DATA_W(71),
 	 .PRESET_VAL(0)
-) reg_IFID (
+) reg_MEMWB (
    .clk (clk),
    .arst_n (arst_n),
    .en(enable),
