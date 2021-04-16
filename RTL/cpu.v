@@ -99,7 +99,7 @@ wire  							WB_reg_write,
 
 //register IF/ID
 reg_arstn_en #(
-   .DATA_W(64)
+   .DATA_W(64),
 	 .PRESET_VAL(0)
 ) regfile_dest_mux (
    .clk (clk),
