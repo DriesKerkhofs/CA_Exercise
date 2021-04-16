@@ -126,7 +126,7 @@ reg_arstn_en #(
 					ID_updated_pc,
 					ID_regfile_data_1,
 					ID_regfile_data_2,
-					ID_regfile_waddr
+					ID_regfile_waddr,
 					ID_alu_op,
 					ID_branch,
 					ID_mem_read,
@@ -140,7 +140,7 @@ reg_arstn_en #(
 					EX_updated_pc,
 					EX_regfile_data_1,
 					EX_regfile_data_2,
-					EX_regfile_waddr
+					EX_regfile_waddr,
 					EX_alu_op,
 					EX_branch,
 					EX_mem_read,
