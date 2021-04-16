@@ -44,7 +44,7 @@ wire [31:0]	  			ID_updated_pc,
 										ID_instruction,
 										ID_regfile_data_1,
 										ID_regfile_data_2;
-wire [4:0]  				ID_regfile_waddr
+wire [4:0]  				ID_regfile_waddr;
 wire [1:0] 					ID_alu_op;
 wire              	ID_branch,
 										ID_mem_read,
