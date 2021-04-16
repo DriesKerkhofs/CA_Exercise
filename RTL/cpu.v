@@ -204,7 +204,7 @@ register_file #(
    .raddr_1  (ID_instruction[25:21]),
    .raddr_2  (ID_instruction[20:16]),
    .waddr    (WB_regfile_waddr     ),
-   .wdata    (regfile_wdata     ),
+   .wdata    (WB_regfile_wdata     ),
    .rdata_1  (ID_regfile_data_1    ),
    .rdata_2  (ID_regfile_data_2    )
 );
