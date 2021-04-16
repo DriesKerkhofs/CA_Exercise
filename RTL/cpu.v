@@ -51,7 +51,7 @@ wire              	ID_branch,
 										ID_reg_write,
 										ID_mem_2_reg,
 										ID_mem_write,
-										ID_reg_dst;
+										ID_reg_dst,
 										ID_alu_src;
 
 wire signed [31:0]  EX_immediate_extended;
