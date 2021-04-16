@@ -101,7 +101,7 @@ wire  							WB_reg_write,
 reg_arstn_en #(
    .DATA_W(64),
 	 .PRESET_VAL(0)
-) regfile_dest_mux (
+) reg_IFID (
    .clk (clk),
    .arst_n (arst_n),
    .en(enable),
