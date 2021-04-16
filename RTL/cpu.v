@@ -166,18 +166,55 @@ reg_arstn_en #(
 // assign EX_alu_src							= ID_alu_src;																			//1 ->169 bits
 
 //register EX/MEM
-assign MEM_jump_pc						= EX_jump_pc;
-assign MEM_branch_pc					= EX_branch_pc;
-assign MEM_alu_out						= EX_alu_out;
-assign MEM_regfile_waddr			= EX_regfile_waddr;
-assign MEM_zero_flag					= EX_zero_flag;
-assign MEM_mem_read						= EX_mem_read;
-assign MEM_branch							= EX_branch;
-assign MEM_jump								= EX_jump;
-assign MEM_reg_write					= EX_reg_write;
-assign MEM_mem_2_reg					= EX_mem_2_reg;
-assign MEM_mem_write					= EX_mem_write;
-assign MEM_regfile_data_2			= EX_regfile_data_2;
+reg_arstn_en #(
+   .DATA_W(140),
+	 .PRESET_VAL(0)
+) reg_EXMEM (
+   .clk (clk),
+   .arst_n (arst_n),
+   .en(enable),
+   .din ({EX_jump_pc,
+		 			EX_branch_pc,
+					EX_regfile_data_2,
+					EX_alu_out,
+					EX_regfile_waddr,
+					EX_zero_flag,
+					EX_mem_read,
+					EX_branch,
+					EX_jump,
+					EX_reg_write,
+					EX_mem_2_reg,
+					EX_mem_write}),
+	 .dout({MEM_jump_pc,
+ 		 			MEM_branch_pc,
+ 					MEM_regfile_data_2,
+ 					MEM_alu_out,
+ 					MEM_regfile_waddr,
+ 					MEM_zero_flag,
+ 					MEM_mem_read,
+ 					MEM_branch,
+ 					MEM_jump,
+ 					MEM_reg_write,
+ 					MEM_mem_2_reg,
+ 					MEM_mem_write})
+);
+
+
+// assign MEM_jump_pc						= EX_jump_pc;																			//32
+// assign MEM_branch_pc					= EX_branch_pc;																		//32
+// assign MEM_regfile_data_2			= EX_regfile_data_2;															//32
+// assign MEM_alu_out						= EX_alu_out;																			//32
+// assign MEM_regfile_waddr			= EX_regfile_waddr;																//5
+// assign MEM_zero_flag					= EX_zero_flag;																		//1
+// assign MEM_mem_read						= EX_mem_read;																		//1
+// assign MEM_branch							= EX_branch;																			//1
+// assign MEM_jump								= EX_jump;																				//1
+// assign MEM_reg_write					= EX_reg_write;																		//1
+// assign MEM_mem_2_reg					= EX_mem_2_reg;																		//1
+// assign MEM_mem_write					= EX_mem_write;																		//1 ->140
+
+
+
 
 //register MEM/WB
 assign WB_dram_data						= MEM_dram_data;
