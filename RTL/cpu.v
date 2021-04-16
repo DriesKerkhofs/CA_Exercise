@@ -44,6 +44,7 @@ wire [31:0]	  			ID_updated_pc,
 										ID_instruction,
 										ID_regfile_data_1,
 										ID_regfile_data_2;
+wire [4:0]  				ID_regfile_waddr
 wire [1:0] 					ID_alu_op;
 wire              	ID_branch,
 										ID_mem_read,
@@ -114,7 +115,7 @@ reg_arstn_en #(
 
 //register ID/EX
 reg_arstn_en #(
-   .DATA_W(169),
+   .DATA_W(174),
 	 .PRESET_VAL(0)
 ) reg_IDEX (
    .clk (clk),
@@ -125,6 +126,7 @@ reg_arstn_en #(
 					ID_updated_pc,
 					ID_regfile_data_1,
 					ID_regfile_data_2,
+					ID_regfile_waddr
 					ID_alu_op,
 					ID_branch,
 					ID_mem_read,
@@ -138,6 +140,7 @@ reg_arstn_en #(
 					EX_updated_pc,
 					EX_regfile_data_1,
 					EX_regfile_data_2,
+					EX_regfile_waddr
 					EX_alu_op,
 					EX_branch,
 					EX_mem_read,
@@ -152,6 +155,7 @@ reg_arstn_en #(
 // assign EX_updated_pc				 	= ID_updated_pc;																	//32
 // assign EX_regfile_data_1     	= ID_regfile_data_1;															//32
 // assign EX_regfile_data_2		 	= ID_regfile_data_2;															//32
+//assign EX_regfile_waddr						= ID_regfile_waddr;
 // assign EX_alu_op						 	= ID_alu_op;																			//2
 // assign EX_branch						 	= ID_branch;																			//1
 // assign EX_mem_read						= ID_mem_read;																		//1
@@ -235,10 +239,10 @@ control_unit control_unit(
 mux_2 #(
    .DATA_W(5)
 ) regfile_dest_mux (
-   .input_a (EX_instruction[15:11]),
-   .input_b (EX_instruction[20:16]),
+   .input_a (ID_instruction[15:11]),
+   .input_b (ID_instruction[20:16]),
    .select_a(ID_reg_dst          ),
-   .mux_out (EX_regfile_waddr     )
+   .mux_out (ID_regfile_waddr     )
 );
 
 register_file #(
