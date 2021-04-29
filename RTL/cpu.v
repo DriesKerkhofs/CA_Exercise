@@ -423,7 +423,7 @@ module forwarding_unit(
 
       if(Rt == MEM_Rd && MEM_Rd != 5'b00000 && MEM_reg_write == 1'b1)           // EX hazard
         forward_B = 2'b11;
-      else else if(Rt == WB_Rd && WB_Rd != 5'b00000 && WB_reg_write == 1'b1)    // MEM hazard
+      else if(Rt == WB_Rd && WB_Rd != 5'b00000 && WB_reg_write == 1'b1)    // MEM hazard
         forward_B = 2'b10;
       else
         forward_B = 2'b00;
