@@ -340,7 +340,7 @@ mux_2 #(
 
 mux_2 #(
    .DATA_W(32)
-) mux_alu_in_0 (
+) mux_alu_in_1 (
    .input_a (EX_Rt_forwarded),
    .input_b (EX_alu_operand_2),
    .select_a(EX_forward_Rt(1)),
