@@ -7,7 +7,7 @@ module forwarding_unit
       input  wire [4:0] MEM_Rd,
       input  wire [4:0] WB_Rd,
       output wire [1:0] forward_Rs,
-      output wire [1:0] forward_Rt,
+      output wire [1:0] forward_Rt
    );
 
    always@(*)begin
