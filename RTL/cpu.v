@@ -316,7 +316,7 @@ mux_2 #(
 ) mux_forward_Rs (
    .input_a (MEM_alu_out),
    .input_b (WB_regfile_wdata),
-   .select_a(EX_forward_Rs(0)),
+   .select_a(EX_forward_Rs[0]),
    .mux_out (EX_Rs_forwarded)
 );
 
@@ -325,7 +325,7 @@ mux_2 #(
 ) mux_forward_Rt (
    .input_a (MEM_alu_out),
    .input_b (WB_regfile_wdata),
-   .select_a(EX_forward_Rt(0)),
+   .select_a(EX_forward_Rt[0]),
    .mux_out (EX_Rt_forwarded)
 );
 
@@ -334,7 +334,7 @@ mux_2 #(
 ) mux_alu_in_0 (
    .input_a (EX_Rs_forwarded),
    .input_b (EX_regfile_data_1),
-   .select_a(EX_forward_Rs(1)),
+   .select_a(EX_forward_Rs[1]),
    .mux_out (EX_alu_in_0)
 );
 
@@ -343,7 +343,7 @@ mux_2 #(
 ) mux_alu_in_1 (
    .input_a (EX_Rt_forwarded),
    .input_b (EX_alu_operand_2),
-   .select_a(EX_forward_Rt(1)),
+   .select_a(EX_forward_Rt[1]),
    .mux_out (EX_alu_in_1)
 );
 
