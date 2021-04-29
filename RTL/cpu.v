@@ -300,7 +300,7 @@ mux_2 #(
    .mux_out (EX_alu_operand_2     )
 );
 
-forwarding_unit forwarding_unit (
+forwarding_unit EX_forwarding_unit (
 	.MEM_reg_write (MEM_reg_write),
 	.WB_reg_write	 (WB_reg_write),
 	.Rs 			 		 (EX_instruction[25:21]),
