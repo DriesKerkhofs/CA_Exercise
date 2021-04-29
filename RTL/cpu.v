@@ -63,10 +63,15 @@ wire [31:0]					EX_instruction,
 										EX_regfile_data_1,
 										EX_regfile_data_2,
 										EX_alu_operand_2,
-										EX_updated_pc;
+										EX_updated_pc,
+										EX_Rs_forwarded,
+										EX_alu_in_0,
+										EX_alu_in_1;
 wire [4:0] 					EX_regfile_waddr;
 wire [3:0] 					EX_alu_control;
-wire [1:0]   				EX_alu_op;
+wire [1:0]   				EX_alu_op,
+										EX_forward_Rs,
+										EX_forward_Rt;
 wire              	EX_zero_flag,
 										EX_branch,
 										EX_mem_read,
@@ -109,8 +114,6 @@ reg_arstn_en #(
    .din ({IF_updated_pc,IF_instruction}),
 	 .dout ({ID_updated_pc,ID_instruction})
 );
-// assign ID_updated_pc  		   	= IF_updated_pc;																//32
-// assign ID_instruction 				= IF_instruction;																//32
 
 
 //register ID/EX
@@ -150,20 +153,7 @@ reg_arstn_en #(
 					EX_mem_write,
 					EX_alu_src})
 );
-// assign EX_immediate_extended  = ID_immediate_extended;													//32
-// assign EX_instruction				 	= ID_instruction;																	//32
-// assign EX_updated_pc				 	= ID_updated_pc;																	//32
-// assign EX_regfile_data_1     	= ID_regfile_data_1;															//32
-// assign EX_regfile_data_2		 	= ID_regfile_data_2;															//32
-//assign EX_regfile_waddr						= ID_regfile_waddr;
-// assign EX_alu_op						 	= ID_alu_op;																			//2
-// assign EX_branch						 	= ID_branch;																			//1
-// assign EX_mem_read						= ID_mem_read;																		//1
-// assign EX_jump								= ID_jump;																				//1
-// assign EX_reg_write						= ID_reg_write;																		//1
-// assign EX_mem_2_reg						= ID_mem_2_reg;																		//1
-// assign EX_mem_write						= ID_mem_write;																		//1
-// assign EX_alu_src							= ID_alu_src;																			//1 ->169 bits
+
 
 //register EX/MEM
 reg_arstn_en #(
@@ -200,21 +190,6 @@ reg_arstn_en #(
 );
 
 
-// assign MEM_jump_pc						= EX_jump_pc;																			//32
-// assign MEM_branch_pc					= EX_branch_pc;																		//32
-// assign MEM_regfile_data_2			= EX_regfile_data_2;															//32
-// assign MEM_alu_out						= EX_alu_out;																			//32
-// assign MEM_regfile_waddr			= EX_regfile_waddr;																//5
-// assign MEM_zero_flag					= EX_zero_flag;																		//1
-// assign MEM_mem_read						= EX_mem_read;																		//1
-// assign MEM_branch							= EX_branch;																			//1
-// assign MEM_jump								= EX_jump;																				//1
-// assign MEM_reg_write					= EX_reg_write;																		//1
-// assign MEM_mem_2_reg					= EX_mem_2_reg;																		//1
-// assign MEM_mem_write					= EX_mem_write;																		//1 ->140
-
-
-
 
 //register MEM/WB
 reg_arstn_en #(
@@ -235,11 +210,6 @@ reg_arstn_en #(
 					WB_reg_write,
 					WB_mem_2_reg})
 );
-// assign WB_dram_data						= MEM_dram_data;																	//32
-// assign WB_alu_out							= MEM_alu_out;																		//32
-// assign WB_regfile_waddr				= MEM_regfile_waddr;															//5
-// assign WB_reg_write						= MEM_reg_write;																	//1
-// assign WB_mem_2_reg						= MEM_mem_2_reg;																  //1 ->71 bits
 
 assign ID_immediate_extended = $signed(ID_instruction[15:0]);
 
@@ -330,16 +300,62 @@ mux_2 #(
    .mux_out (EX_alu_operand_2     )
 );
 
+forwarding_unit forwarding_unit (
+	.MEM_reg_write (MEM_reg_write),
+	.WB_reg_write	 (WB_reg_write),
+	.Rs 			 		 (EX_instruction[25:21]),
+	.Rt 					 (EX_instruction[20:16]),
+	.MEM_Rd 			 (MEM_regfile_waddr),
+	.WB_Rd 				 (WB_regfile_waddr),
+	.forward_Rs 	 (EX_forward_Rs),
+	.forward_Rt 	 (EX_forward_Rt)
+);
+
+mux_2 #(
+   .DATA_W(32)
+) mux_forward_Rs (
+   .input_a (MEM_alu_out),
+   .input_b (WB_regfile_wdata),
+   .select_a(EX_forward_Rs(0)),
+   .mux_out (EX_Rs_forwarded)
+);
+
+mux_2 #(
+   .DATA_W(32)
+) mux_forward_Rt (
+   .input_a (MEM_alu_out),
+   .input_b (WB_regfile_wdata),
+   .select_a(EX_forward_Rt(0)),
+   .mux_out (EX_Rt_forwarded)
+);
+
+mux_2 #(
+   .DATA_W(32)
+) mux_alu_in_0 (
+   .input_a (EX_Rs_forwarded),
+   .input_b (EX_regfile_data_1),
+   .select_a(EX_forward_Rs(1)),
+   .mux_out (EX_alu_in_0)
+);
+
+mux_2 #(
+   .DATA_W(32)
+) mux_alu_in_0 (
+   .input_a (EX_Rt_forwarded),
+   .input_b (EX_alu_operand_2),
+   .select_a(EX_forward_Rt(1)),
+   .mux_out (EX_alu_in_1)
+);
 
 alu#(
    .DATA_W(32)
 ) alu(
-   .alu_in_0 (EX_regfile_data_1),
-   .alu_in_1 (EX_alu_operand_2 ),
-   .alu_ctrl (EX_alu_control   ),
-   .alu_out  (EX_alu_out       ),
+   .alu_in_0 (EX_alu_in_0),
+   .alu_in_1 (EX_alu_in_1),
+   .alu_ctrl (EX_alu_control),
+   .alu_out  (EX_alu_out),
    .shft_amnt(EX_instruction[10:6]),
-   .zero_flag(EX_zero_flag     ),
+   .zero_flag(EX_zero_flag),
    .overflow (              )
 );
 
